@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "無効なアクションです" }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("inquiries")
       .update({
         status: action,

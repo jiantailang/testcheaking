@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { generateAIReply } from "@/lib/claude";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const aiResult = await generateAIReply(name, category, body);
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("inquiries")
       .update({
         ai_reply: aiResult.reply,
