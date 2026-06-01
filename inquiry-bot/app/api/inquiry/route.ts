@@ -13,8 +13,10 @@ export async function POST(req: NextRequest) {
     }
 
     const sb = getSupabase();
+
+    // Supabase未設定の場合はデモモードとして成功を返す
     if (!sb) {
-      return NextResponse.json({ error: "データベースが設定されていません" }, { status: 503 });
+      return NextResponse.json({ success: true, id: "demo", demo: true });
     }
 
     const { data, error } = await sb
