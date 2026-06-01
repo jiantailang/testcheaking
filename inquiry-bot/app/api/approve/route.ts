@@ -15,12 +15,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "無効なアクションです" }, { status: 400 });
     }
 
-    const { error } = await getSupabase()
+    const sb = getSupabase();
+    if (!sb) {
+      return NextResponse.json({ error: "データベースが設定されていません" }, { status: 503 });
+    }
+
+    const { error } = await sb
       .from("inquiries")
-      .update({
-        status: action,
-        approved_at: new Date().toISOString(),
-      })
+      .update({ status: action, approved_at: new Date().toISOString() })
       .eq("id", id);
 
     if (error) throw error;

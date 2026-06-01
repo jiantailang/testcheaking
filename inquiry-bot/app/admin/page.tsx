@@ -14,7 +14,10 @@ export default function AdminPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
 
   const fetchInquiries = useCallback(async () => {
-    const query = getSupabase()
+    const sb = getSupabase();
+    if (!sb) { setLoading(false); return; }
+
+    const query = sb
       .from("inquiries")
       .select("*")
       .order("created_at", { ascending: false });

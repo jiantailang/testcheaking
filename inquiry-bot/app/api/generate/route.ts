@@ -14,13 +14,14 @@ export async function POST(req: NextRequest) {
 
     const aiResult = await generateAIReply(name, category, body);
 
-    const { error } = await getSupabase()
+    const sb = getSupabase();
+    if (!sb) {
+      return NextResponse.json({ success: true, result: aiResult });
+    }
+
+    const { error } = await sb
       .from("inquiries")
-      .update({
-        ai_reply: aiResult.reply,
-        ai_category: aiResult.category,
-        urgency: aiResult.urgency,
-      })
+      .update({ ai_reply: aiResult.reply, ai_category: aiResult.category, urgency: aiResult.urgency })
       .eq("id", id);
 
     if (error) throw error;

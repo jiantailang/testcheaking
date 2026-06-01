@@ -12,7 +12,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "必須項目が未入力です" }, { status: 400 });
     }
 
-    const { data, error } = await getSupabase()
+    const sb = getSupabase();
+    if (!sb) {
+      return NextResponse.json({ error: "データベースが設定されていません" }, { status: 503 });
+    }
+
+    const { data, error } = await sb
       .from("inquiries")
       .insert([{ name, company: company || null, email, category, body: inquiryBody }])
       .select()
@@ -20,7 +25,6 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    // Trigger AI generation asynchronously
     fetch(`${req.nextUrl.origin}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
