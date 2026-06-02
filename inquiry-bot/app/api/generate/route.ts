@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { generateAIReply } from "@/lib/claude";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,13 +14,14 @@ export async function POST(req: NextRequest) {
 
     const aiResult = await generateAIReply(name, category, body);
 
-    const { error } = await supabase
+    const sb = getSupabase();
+    if (!sb) {
+      return NextResponse.json({ success: true, result: aiResult });
+    }
+
+    const { error } = await sb
       .from("inquiries")
-      .update({
-        ai_reply: aiResult.reply,
-        ai_category: aiResult.category,
-        urgency: aiResult.urgency,
-      })
+      .update({ ai_reply: aiResult.reply, ai_category: aiResult.category, urgency: aiResult.urgency })
       .eq("id", id);
 
     if (error) throw error;

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import InboxList from "@/components/InboxList";
 import DetailPanel from "@/components/DetailPanel";
-import { supabase, Inquiry } from "@/lib/supabase";
+import { getSupabase, Inquiry } from "@/lib/supabase";
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
 
@@ -14,7 +14,10 @@ export default function AdminPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
 
   const fetchInquiries = useCallback(async () => {
-    const query = supabase
+    const sb = getSupabase();
+    if (!sb) { setLoading(false); return; }
+
+    const query = sb
       .from("inquiries")
       .select("*")
       .order("created_at", { ascending: false });
